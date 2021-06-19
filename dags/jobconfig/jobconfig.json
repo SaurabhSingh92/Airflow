@@ -1,0 +1,21 @@
+{
+	"default": {
+		"owner": "EDP",
+		"dag_id": "Test DAg",
+		"start_date": "days_ago(2)",
+		"catchup": "False"
+	},
+	"args": {
+		"dependency_on_past": "False"
+	},
+	"Task": {
+		"File": {
+			"operator": "DummyOperator",
+			"task_name": "First_Task"
+		},
+		"File_hist": {
+			"operator": "DummyOperator",
+			"task_name": "second_task"
+		}
+	}
+}
