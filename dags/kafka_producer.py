@@ -1,6 +1,6 @@
 import tweepy
 from airflow import DAG
-from airflow.utils.dates import days_ago
+from datetime import datetime, timedelta
 from airflow.operators.python import PythonOperator
 import tweepy as tw
 from confluent_kafka import Producer
@@ -11,12 +11,17 @@ api_secret = 'CrBbb9OhrYQmGKS78F1T4OX6w7cRNjseONTDtDyaf4gaYUtpm0'
 access_token = '757946485-fXc95aDgG9tNSND05GbAm5CJUSRPH4tvoBD6XR6N'
 access_token_secret = '8OyEjacpvFb0yReAnMrhwFE6yQHEDH2agEscNbu0smTt5'
 
-args = {
+# Default settings applied to all tasks
+default_args = {
     'owner': 'airflow',
-    'start_date': days_ago(2),
+    'depends_on_past': False,
+    'email_on_failure': False,
+    'email_on_retry': False,
+    'retries': 1,
+    'retry_delay': timedelta(minutes=5)
 }
 
-def kafkaproducer:
+def kafkaproducer():
     conf = {'bootstrap.servers': "localhost:9092",
             'client.id': socket.gethostname()}
     producer = Producer(conf)
@@ -38,7 +43,15 @@ def kafkaproducer:
         producer.flush()
 
 
-with DAG as ( 'Produce App', default_args=args, catchup= false) as dag:
+# Using a DAG context manager, you don't have to specify the dag property of each task
+with DAG('example_dag',
+         start_date=datetime(2019, 1, 1),
+         max_active_runs=3,
+         schedule_interval=timedelta(minutes=1),  # https://airflow.apache.org/docs/stable/scheduler.html#dag-runs
+         default_args=default_args,
+         catchup=False # enable if you don't want historical dag runs to run
+         ) as dag:
+
     start = PythonOperator(
         task_id="prodcuder",
         python_callable=kafkaproducer
