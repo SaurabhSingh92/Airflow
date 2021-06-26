@@ -64,4 +64,4 @@ with DAG('kafka_example_dag',
         bash_command='ssh localhost:9092 | xargs echo'
     )
 
-    start
+    start >> end
