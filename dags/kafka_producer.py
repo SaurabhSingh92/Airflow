@@ -7,7 +7,7 @@ import tweepy as tw
 from confluent_kafka import Producer
 import socket
 
-api_key = Variable.get("tw_api_key")
+api_key = Variable.get("tw_api")
 api_secret = Variable.get("tw_api_secret")
 access_token = Variable.get("tw_access_token")
 access_token_secret = Variable.get("tw_access_token_secret")
