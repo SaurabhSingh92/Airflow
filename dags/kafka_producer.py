@@ -5,9 +5,8 @@ from datetime import datetime, timedelta
 from airflow.operators.python import PythonOperator
 import tweepy as tw
 from confluent_kafka import Producer
-import socket
 
-api_key = Variable.get_val("tw_api_key")
+api_key = Variable.get_val("tw_api")
 api_secret = Variable.get("tw_api_secret")
 access_token = Variable.get("tw_access_token")
 access_token_secret = Variable.get("tw_access_token_secret")
@@ -24,6 +23,9 @@ default_args = {
 
 def kafkaproducer():
 
+    conf = {'bootstrap.servers': "localhost:9092",'topic':"sample"}
+    producer=Producer(conf)
+
     auth = tw.OAuthHandler(api_key, api_secret)
     auth.set_access_token(access_token, access_token_secret)
     api = tw.API(auth, wait_on_rate_limit=True)
@@ -37,7 +39,9 @@ def kafkaproducer():
                        show_user=True).items(5)
 
     for tweet in tweets:
+        producer.produce(key=f"{tweet.id_str}", value=f"{tweet.text}")
         print(tweet.text)
+        producer.flush()
 
 
 # Using a DAG context manager, you don't have to specify the dag property of each task
