@@ -3,10 +3,11 @@ from airflow import DAG
 from airflow.models import Variable
 from datetime import datetime, timedelta
 from airflow.operators.python import PythonOperator
+from airflow.operators.bash import BashOperator
 import tweepy as tw
 from confluent_kafka import Producer
 
-api_key = Variable.get_val("tw_api")
+api_key = Variable.get("tw_api")
 api_secret = Variable.get("tw_api_secret")
 access_token = Variable.get("tw_access_token")
 access_token_secret = Variable.get("tw_access_token_secret")
@@ -23,7 +24,7 @@ default_args = {
 
 def kafkaproducer():
 
-    conf = {'bootstrap.servers': "localhost:9092",'topic':"sample"}
+    conf = {'bootstrap.servers': "localhost:9092"}
     producer=Producer(conf)
 
     auth = tw.OAuthHandler(api_key, api_secret)
@@ -39,7 +40,7 @@ def kafkaproducer():
                        show_user=True).items(5)
 
     for tweet in tweets:
-        producer.produce(key=f"{tweet.id_str}", value=f"{tweet.text}")
+        producer.produce('sample', key=f"{tweet.id_str}", value=f"{tweet.text}")
         print(tweet.text)
         producer.flush()
 
@@ -56,6 +57,11 @@ with DAG('kafka_example_dag',
     start = PythonOperator(
         task_id="prodcuder",
         python_callable=kafkaproducer,
+    )
+
+    end = BashOperator(
+        task_id="sshlocalhost",
+        bash_command='ssh localhost:9092 | xargs echo'
     )
 
     start
