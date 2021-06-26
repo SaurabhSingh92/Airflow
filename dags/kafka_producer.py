@@ -56,3 +56,5 @@ with DAG('example_dag',
         task_id="prodcuder",
         python_callable=kafkaproducer
     )
+
+    start
