@@ -55,6 +55,7 @@ with DAG('kafka_example_dag',
     start = PythonOperator(
         task_id="prodcuder",
         python_callable=kafkaproducer,
+        conn_id=default_conn_id,
     )
 
     start
