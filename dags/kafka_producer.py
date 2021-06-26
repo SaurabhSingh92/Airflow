@@ -22,9 +22,6 @@ default_args = {
 }
 
 def kafkaproducer():
-    conf = {'bootstrap.servers': "localhost:9092",
-            'client.id': socket.gethostname()}
-    producer = Producer(conf)
 
     auth = tw.OAuthHandler(api_key, api_secret)
     auth.set_access_token(access_token, access_token_secret)
@@ -39,8 +36,7 @@ def kafkaproducer():
                        show_user=True).items(5)
 
     for tweet in tweets:
-        producer.produce('sample', key=f"{tweet.id_str}", value=f"{tweet.text}")
-        producer.flush()
+        print(tweet.text)
 
 
 # Using a DAG context manager, you don't have to specify the dag property of each task
@@ -55,7 +51,6 @@ with DAG('kafka_example_dag',
     start = PythonOperator(
         task_id="prodcuder",
         python_callable=kafkaproducer,
-        conn_id=default_conn_id,
     )
 
     start
