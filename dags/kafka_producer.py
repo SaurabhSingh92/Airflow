@@ -1,15 +1,16 @@
 import tweepy
 from airflow import DAG
+from airflow.models import Variable
 from datetime import datetime, timedelta
 from airflow.operators.python import PythonOperator
 import tweepy as tw
 from confluent_kafka import Producer
 import socket
 
-api_key = 'mIUDtuXy6b9C4tcV1CeNYfoPU'
-api_secret = 'CrBbb9OhrYQmGKS78F1T4OX6w7cRNjseONTDtDyaf4gaYUtpm0'
-access_token = '757946485-fXc95aDgG9tNSND05GbAm5CJUSRPH4tvoBD6XR6N'
-access_token_secret = '8OyEjacpvFb0yReAnMrhwFE6yQHEDH2agEscNbu0smTt5'
+api_key = Variable.get("tw_api_key")
+api_secret = Variable.get("tw_api_secret")
+access_token = Variable.get("tw_access_token")
+access_token_secret = Variable.get("tw_access_token_secret")
 
 # Default settings applied to all tasks
 default_args = {
@@ -43,7 +44,7 @@ def kafkaproducer():
 with DAG('kafka_example_dag',
          start_date=datetime(2019, 1, 1),
          max_active_runs=3,
-         schedule_interval=timedelta(minutes=1),  # https://airflow.apache.org/docs/stable/scheduler.html#dag-runs
+         schedule_interval=None,  # https://airflow.apache.org/docs/stable/scheduler.html#dag-runs
          default_args=default_args,
          catchup=False # enable if you don't want historical dag runs to run
          ) as dag:
