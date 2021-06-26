@@ -23,7 +23,6 @@ default_args = {
 }
 
 def kafkaproducer():
-
     conf = {'bootstrap.servers': "localhost:9092"}
     producer=Producer(conf)
 
@@ -57,11 +56,12 @@ with DAG('kafka_example_dag',
     start = PythonOperator(
         task_id="prodcuder",
         python_callable=kafkaproducer,
+        connection_id=kafka_conn_id,
     )
 
     end = BashOperator(
         task_id="sshlocalhost",
-        bash_command='ssh localhost:9092 | xargs echo'
+        bash_command='echo "Done"'
     )
 
     start >> end
