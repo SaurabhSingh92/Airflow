@@ -15,7 +15,7 @@ class CreateDagOperator:
 
     @staticmethod
     def CreateDag(dag_name, default_args):
-        home_path = "dags/jobconfig"
+        home_path = "/Users/saurabhsingh/PycharmProjects/airflow/dags/jobconfig"
         job_dict = CreateDagOperator.get_config(home_path, "jobconfig.json")
 
         default_args_upt = job_dict["args"].update(default_args)
